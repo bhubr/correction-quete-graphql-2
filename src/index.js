@@ -49,6 +49,8 @@ const coursesData = [
       url: 'https://codingthesmartway.com/courses/understand-javascript/'
   }
 ];
+
+// Simuler un "integer auto_increment" à la MySQL
 let nextId = coursesData.length + 1;
 
 const getCourse = ({ id }) => {
