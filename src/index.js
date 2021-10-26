@@ -16,6 +16,10 @@ const schema = buildSchema(`
     allCourses: [Course]
     course(id: Int!): Course
     courses(topic: String): [Course]
+    coursesByTitle(search: String): [Course]
+  }
+  type Mutation {
+    createCourse(title: String, author: String, description: String, topic: String, url: String): [Course]
   }
 `);
 
@@ -44,16 +48,34 @@ const coursesData = [
       topic: 'JavaScript',
       url: 'https://codingthesmartway.com/courses/understand-javascript/'
   }
-]
+];
+let nextId = coursesData.length + 1;
 
-const getCourse = (args) => {
-  return coursesData.find(course => course.id === args.id);
+const getCourse = ({ id }) => {
+  return coursesData.find(course => course.id === id);
 }
 
-const getCourses = (args) => {
+const getCourses = ({ topic }) => {
   if (args.topic) {
-    return coursesData.filter(course => course.topic === args.topic);
+    return coursesData.filter(course => course.topic === topic);
   }
+  return coursesData;
+}
+
+const getCoursesByTitle = ({ search }) => {
+  console.log(search, typeof search);
+  const searchLower = search.toLowerCase();
+  console.log('searchLower', searchLower);
+  const courses = coursesData.filter(
+    course => course.title.toLowerCase().includes(searchLower)
+  );
+  return courses;
+}
+
+createCourse = (payload) => {
+  const newCourse = { id: nextId, ...payload };
+  nextId += 1;
+  coursesData.push(newCourse);
   return coursesData;
 }
 
@@ -62,6 +84,8 @@ const resolver = {
   allCourses: () => coursesData,
   course: getCourse,
   courses: getCourses,
+  coursesByTitle: getCoursesByTitle,
+  createCourse,
 }
 
 const app = express();
